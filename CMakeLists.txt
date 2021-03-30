@@ -1,13 +1,14 @@
 project(opencl-example)
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.9)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 #set(CMAKE_CXX_STANDARD 11)
 #set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #deps
 #1-OpenCL
-find_package(OpenCL REQUIRED)
+#find_package(OpenCL REQUIRED)
+include(FindOpenCL)
 
 message(STATUS "OpenCL found: ${OPENCL_FOUND}")
 message(STATUS "OpenCL includes: ${OPENCL_INCLUDE_DIRS}")
