@@ -7,7 +7,6 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 #deps
 #1-OpenCL
-#find_package(OpenCL REQUIRED)
 include(FindOpenCL)
 
 message(STATUS "OpenCL found: ${OPENCL_FOUND}")
