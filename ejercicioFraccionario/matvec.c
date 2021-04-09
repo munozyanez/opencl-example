@@ -12,6 +12,8 @@
 #include <CL/cl.h>
 #endif
 
+void comprobacion(float* pmat, float* pcorr, float *pvec);
+
 int main() {
 
    /* Host/device data structures */
@@ -19,7 +21,7 @@ int main() {
    cl_device_id device;
    cl_context context;
    cl_command_queue queue;
-   cl_int i, err;
+   cl_int err;
 
    /* Program/kernel data structures */
    cl_program program;
@@ -34,17 +36,9 @@ int main() {
    cl_mem mat_buff, vec_buff, res_buff;
    size_t work_units_per_kernel;
 
+   comprobacion(&mat[0], &correct[0], &vec[0]);
    /* Initialize data to be processed by the kernel */
-   for(i=0; i<16; i++) {
-      mat[i] = i * 2.0f;
-   } 
-   for(i=0; i<4; i++) {
-      vec[i] = i * 3.0f;
-      correct[0] += mat[i]    * vec[i];
-      correct[1] += mat[i+4]  * vec[i];
-      correct[2] += mat[i+8]  * vec[i];
-      correct[3] += mat[i+12] * vec[i];      
-   }
+
 
    /* Identify a platform */
    err = clGetPlatformIDs(1, &platform, NULL);
@@ -179,3 +173,17 @@ int main() {
    return 0;
 }
 
+void comprobacion(float* pmat, float* pcorr, float * pvec)
+{
+    for(int i=0; i<16; i++) {
+        pmat[i] = i * 2.0f;
+    }
+
+    for(int i=0; i<4; i++) {
+        pvec[i] = i * 3.0f;
+        pcorr[0] += pmat[i]    * pvec[i];
+        pcorr[1] += pmat[i+4]  * pvec[i];
+        pcorr[2] += pmat[i+8]  * pvec[i];
+        pcorr[3] += pmat[i+12] * pvec[i];
+    }
+}

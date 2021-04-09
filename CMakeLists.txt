@@ -2,6 +2,8 @@ project(opencl-example)
 
 cmake_minimum_required(VERSION 2.9)
 
+#deps
+#1-OpenCL
 include(FindOpenCL)
 
 include_directories(${OpenCL_INCLUDE_DIRS})
