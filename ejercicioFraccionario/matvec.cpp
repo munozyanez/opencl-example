@@ -5,12 +5,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include "Fraccional.h"
 #ifdef MAC
 #include <OpenCL/cl.h>
 #else  
 #include <CL/cl.h>
 #endif
+
+#include "Fraccional.h"
+
 
 //void comprobacion(float* pmat, float* pcorr, float *pvec);
 
@@ -36,6 +38,7 @@ int main() {
    cl_mem mat_buff, vec_buff, res_buff;
    size_t work_units_per_kernel;
 
+    clConv comp1;
    comprobacion(&mat[0], &correct[0], &vec[0]);
    /* Initialize data to be processed by the kernel */
 

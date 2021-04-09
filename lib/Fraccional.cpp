@@ -5,6 +5,7 @@
 //#include <CL/cl.h>
 #endif
 
+
 void comprobacion(float* pmat, float* pcorr, float * pvec)
 {
     for(int i=0; i<16; i++) {

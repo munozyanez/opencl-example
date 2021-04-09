@@ -2,14 +2,15 @@ project(opencl-example)
 
 cmake_minimum_required(VERSION 2.9)
 
-
+#Hay que añadir la librería antes para poder compilar luego.
+add_subdirectory(lib)
 
 add_subdirectory(ejercicioFraccionario ejercicioFraccionario)
 
 
-project(FracionalControl)
-add_subdirectory(lib)
+#project(FracionalControl) no se pueden poner varios proyectos en un archivo
 
+message(STATUS " top "${INCLUDE_DIRECTORIES})
 
 
 
@@ -24,5 +25,5 @@ function(echo_all_cmake_variable_values)
 endfunction()
 
 
-echo_all_cmake_variable_values()
+#echo_all_cmake_variable_values()
 

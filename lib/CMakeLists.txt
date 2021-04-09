@@ -1,6 +1,15 @@
-add_library(lib SHARED
-   Fraccional.h
-   Fraccional.cpp)
-#target_include_directories(lib PUBLIC
-#${CMAKE_CURRENT_LIST_DIR})
+project(clconv)
+
+aux_source_directory(. clconv_SRCS)
+
+
+SET(clconv_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "Library include directories" FORCE)
+message(STATUS "clconv_INCLUDE_DIRS: " ${clconv_INCLUDE_DIRS})
+
+SET(clconv_LIBARIES ${PROJECT_NAME} CACHE STRING "Library directories" FORCE)
+message(STATUS "clconv_LIBARIES: " ${PROJECT_NAME})
+
+add_library(${PROJECT_NAME} SHARED ${clconv_SRCS} ${clconv_INCLUDE_DIRS})
+
+#target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}) no hace falta
 
