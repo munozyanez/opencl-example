@@ -22,5 +22,5 @@ function(echo_all_cmake_variable_values)
 endfunction()
 
 
-#echo_all_cmake_variable_values()
+echo_all_cmake_variable_values()
 
