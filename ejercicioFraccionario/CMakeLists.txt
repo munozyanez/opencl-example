@@ -18,3 +18,4 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/matvec.cl ${CMAKE_CURRENT_BINARY_DIR}
 #                              "${PROJECT_BINARY_DIR}"
 #                              ${clconv_INCLUDE_DIRECTORIES}
 #                              )
+
