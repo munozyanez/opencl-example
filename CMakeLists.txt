@@ -1,4 +1,4 @@
-project(opencl-example)
+project(FracionalControl)
 
 cmake_minimum_required(VERSION 2.9)
 
@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 2.9)
 add_subdirectory(ejercicioFraccionario ejercicioFraccionario)
 
 
-project(FracionalControl)
+
 add_subdirectory(lib)
 
 
