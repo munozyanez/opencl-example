@@ -7,6 +7,12 @@ cmake_minimum_required(VERSION 2.9)
 add_subdirectory(ejercicioFraccionario ejercicioFraccionario)
 
 
+project(FracionalControl)
+add_subdirectory(lib)
+
+
+
+
 ##functions
 function(echo_all_cmake_variable_values)
   message(STATUS "")

@@ -5,14 +5,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-
+#include "Fraccional.h"
 #ifdef MAC
 #include <OpenCL/cl.h>
 #else  
 #include <CL/cl.h>
 #endif
 
-void comprobacion(float* pmat, float* pcorr, float *pvec);
+//void comprobacion(float* pmat, float* pcorr, float *pvec);
 
 int main() {
 
@@ -173,7 +173,7 @@ int main() {
    return 0;
 }
 
-void comprobacion(float* pmat, float* pcorr, float * pvec)
+/*void comprobacion(float* pmat, float* pcorr, float * pvec)
 {
     for(int i=0; i<16; i++) {
         pmat[i] = i * 2.0f;
@@ -186,4 +186,4 @@ void comprobacion(float* pmat, float* pcorr, float * pvec)
         pcorr[2] += pmat[i+8]  * pvec[i];
         pcorr[3] += pmat[i+12] * pvec[i];
     }
-}
+}*/
