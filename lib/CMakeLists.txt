@@ -1,5 +1,8 @@
 project(clconv)
 
+include(FindOpenCL)
+
+
 aux_source_directory(. clconv_SRCS)
 
 
@@ -11,5 +14,10 @@ message(STATUS "clconv_LIBARIES: " ${PROJECT_NAME})
 
 add_library(${PROJECT_NAME} SHARED ${clconv_SRCS} ${clconv_INCLUDE_DIRS})
 
+target_link_libraries(${PROJECT_NAME} OpenCL::OpenCL)
+
 #target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}) no hace falta
+
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/matvec.cl ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
