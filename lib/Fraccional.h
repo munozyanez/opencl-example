@@ -5,7 +5,7 @@
 #define PROGRAM_FILE "matvec.cl"
 #define KERNEL_FUNC "matvec_mult"
 
-
+#include <iostream>
 #include <vector>
 #include <stdio.h>
 #include <stdlib.h>

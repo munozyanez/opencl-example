@@ -1,4 +1,5 @@
 #include "Fraccional.h"
+
 #ifdef MAC
 #include <OpenCL/cl.h>
 #else
@@ -20,7 +21,6 @@ void comprobacion(float* pmat, float* pcorr, float * pvec)
         pcorr[3] += pmat[i+12] * pvec[i];
     }
 }
-
 clConv::clConv(long new_verctorSize) : verctorSize(new_verctorSize)
 {
 
@@ -36,8 +36,6 @@ clConv::clConv(long new_verctorSize) : verctorSize(new_verctorSize)
 //    test_result(result,correct);
 }
 
-
-
 clConv::~clConv()
 {
     deallocate_resources(context,program,queue,kernel,res_buff,vec_buff,mat_buff);
@@ -49,6 +47,9 @@ long clConv::convolution(const vector<double> &new_v1, const vector<double> &new
 
     v1=new_v1;
     v2=new_v2;
+    for(int i=0;i<10;i++){
+        std::cout<<v1[i]<<" "<<v2[i]<<endl;
+    }
 
 //    result.clear();
 //    result.resize(verctorSize);
@@ -62,8 +63,6 @@ long clConv::convolution(const vector<double> &new_v1, const vector<double> &new
 
     return 0;
 }
-
-
 void clConv::create_context(cl_platform_id &platform,cl_device_id &device,cl_context &context,cl_int &err){
    /* Identify a platform */
     err = clGetPlatformIDs(1, &platform, NULL);
@@ -165,7 +164,7 @@ void clConv::create_queue(cl_command_queue &queue,cl_context &context,cl_device_
     }
 
     /* Enqueue the command queue to the device */
-    work_units_per_kernel = 4; /* 4 work-units per kernel */
+    work_units_per_kernel = 10; /* 4 work-units per kernel */
     err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &work_units_per_kernel,
        NULL, 0, NULL, NULL);
     if(err < 0) {
