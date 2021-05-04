@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 2.9)
 add_subdirectory(lib)
 
 add_subdirectory(ejercicioFraccionario ejercicioFraccionario)
+add_subdirectory(Reduction Reduction)
 
 #project(FracionalControl) no se pueden poner varios proyectos en un archivo
 
