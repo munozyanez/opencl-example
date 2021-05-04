@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define PROGRAM_FILE "reduction_complete.cl"
 
-#define ARRAY_SIZE 1048576
+#define ARRAY_SIZE 1048576/4
 #define KERNEL_1 "reduction_vector"
 #define KERNEL_2 "reduction_complete"
 
