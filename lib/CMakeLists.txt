@@ -19,5 +19,6 @@ target_link_libraries(${PROJECT_NAME} OpenCL::OpenCL)
 #target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}) no hace falta
 
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/lib/matvec.cl ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/matvec.cl  ${CMAKE_CURRENT_BINARY_DIR}/../ejercicioFraccionario COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sumvec.cl  ${CMAKE_CURRENT_BINARY_DIR}/../ejercicioFraccionario COPYONLY)
 

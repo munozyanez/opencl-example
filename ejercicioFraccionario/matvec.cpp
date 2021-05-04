@@ -1,11 +1,18 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define PROGRAM_FILE "matvec.cl"
 #define KERNEL_FUNC "matvec_mult"
-
+#define PROGRAM_FILE2 "sumvec.cl"
+#define KERNEL_FUNC2 "matvec_sum"
+#define SIZE_V 1024
+#define SIZE_R (SIZE_V/4)
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <iostream>
+#include <ctime>
+#include <chrono>
+
+
 
 #include "Fraccional.h"
 //void comprobacion(float* pmat, float* pcorr, float *pvec);
@@ -17,6 +24,7 @@
 
 
 int main() {
+            unsigned t0, t1,t3,t4;
 
     /* Host/device data structures */
        cl_platform_id platform;
@@ -26,29 +34,29 @@ int main() {
        cl_int i, err;
 
        /* Program/kernel data structures */
-       cl_program program;
-       FILE *program_handle;
-       char *program_buffer, *program_log;
-       size_t program_size, log_size;
-       cl_kernel kernel;
+       cl_program program,program2;
+       FILE *program_handle,*program_handle2;
+       char *program_buffer, *program_buffer2,*program_log,*program_log2;
+       size_t program_size,program_size2, log_size,log_size2;
+       cl_kernel kernel,kernel2;
 
        /* Data and buffers */
-       float mat[16], vec[16], result[4];
-       float correct[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+       float mat[SIZE_V], vec[SIZE_V], result[SIZE_R];
+       float correct;
        cl_mem mat_buff, vec_buff, res_buff;
        size_t work_units_per_kernel;
 
        /* Initialize data to be processed by the kernel */
-       for(i=0; i<16; i++) {
-          mat[i] = i * 2.0f;
+       for(i=0; i<SIZE_V; i++) {
+          mat[i] = i * 3.0f;
        }
-       for(i=0; i<16; i++) {
-          vec[i] = i * 3.0f;
-          /*correct[0] += mat[i]    * vec[i];
-          correct[1] += mat[i+4]  * vec[i];
-          correct[2] += mat[i+8]  * vec[i];
-          correct[3] += mat[i+12] * vec[i];*/
+       for(i=0; i<SIZE_V; i++) {
+          vec[i] = i * 1.0f;
        }
+
+        for(i=0; i<SIZE_V; i++) {
+          correct+= mat[i] * vec[i];
+        }
 
        /* Identify a platform */
        err = clGetPlatformIDs(1, &platform, NULL);
@@ -119,15 +127,15 @@ int main() {
 
        /* Create CL buffers to hold input and output data */
        mat_buff = clCreateBuffer(context, CL_MEM_READ_ONLY |
-          CL_MEM_COPY_HOST_PTR, sizeof(float)*16, mat, &err);
+          CL_MEM_COPY_HOST_PTR, sizeof(float)*SIZE_V, mat, &err);
        if(err < 0) {
           perror("Couldn't create a buffer object");
           exit(1);
        }
        vec_buff = clCreateBuffer(context, CL_MEM_READ_ONLY |
-          CL_MEM_COPY_HOST_PTR, sizeof(float)*16, vec, NULL);
+          CL_MEM_COPY_HOST_PTR, sizeof(float)*SIZE_V, vec, NULL);
        res_buff = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
-          sizeof(float)*4, NULL, NULL);
+          sizeof(float)*SIZE_R, NULL, NULL);
 
        /* Create kernel arguments from the CL buffers */
        err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &mat_buff);
@@ -138,6 +146,9 @@ int main() {
        clSetKernelArg(kernel, 1, sizeof(cl_mem), &vec_buff);
        clSetKernelArg(kernel, 2, sizeof(cl_mem), &res_buff);
 
+
+
+
        /* Create a CL command queue for the device*/
        queue = clCreateCommandQueue(context, device, 0, &err);
        if(err < 0) {
@@ -145,17 +156,37 @@ int main() {
           exit(1);
        }
 
+
+        chrono::system_clock::time_point start = std::chrono::system_clock::now();
+        t0=clock();
+
+
        /* Enqueue the command queue to the device */
-       work_units_per_kernel = 4; /* 4 work-units per kernel */
+       work_units_per_kernel =SIZE_R; //SIZE_R; /* 4 work-units per kernel */
+
        err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &work_units_per_kernel,
           NULL, 0, NULL, NULL);
+      // err = clEnqueueNDRangeKernel(queue, kernel2, 1, NULL, &work_units_per_kernel,
+        //  NULL, 0, NULL, NULL);
        if(err < 0) {
           perror("Couldn't enqueue the kernel execution command");
           exit(1);
        }
+       chrono::system_clock::time_point finish = std::chrono::system_clock::now();
+       chrono::nanoseconds elapsedNanoseconds = finish.time_since_epoch() - start.time_since_epoch();
+       double tiempo1bucle = elapsedNanoseconds.count()/1000;
+       double tiempototal = elapsedNanoseconds.count();
+       cout << "Tiempo 1 bucle ms: " << (tiempo1bucle/1000000) << endl;
+       cout << "Tiempo total: ms " << (tiempototal/1000000) << endl;
+
+       t1 = clock();
+       double time = (double(t1-t0)/CLOCKS_PER_SEC);
+       cout << "Execution Time OpenCl: " << time << endl;
+
+
 
        /* Read the result */
-       err = clEnqueueReadBuffer(queue, res_buff, CL_TRUE, 0, sizeof(float)*4,
+       err = clEnqueueReadBuffer(queue, res_buff, CL_TRUE, 0, sizeof(float)*SIZE_R,
           result, 0, NULL, NULL);
        if(err < 0) {
           perror("Couldn't enqueue the read buffer command");
@@ -173,24 +204,24 @@ int main() {
       printf("Matrix-vector multiplication unsuccessful.\n");
    }*/
    cout<<"vec:"<<endl;
-   for(int i=0;i<16;i++){
-         if(i==0)cout<<"[";
+   for(int i=SIZE_V-16;i<SIZE_V;i++){
+         if(i==SIZE_V-16)cout<<"[";
    cout<<vec[i]<<" ";
-    if(i==15)cout<<"]"<<endl;
+    if(i==SIZE_V-1)cout<<"]"<<endl;
    }
    cout<<"mat:"<<endl<<"|";
-   for(int i=0;i<16;i++){
+   for(int i=SIZE_V-16;i<SIZE_V;i++){
   /* cout<<mat[i-1]<<" ";
    if(i%4==0){cout<<"|"<<endl<<"|";}*/
-   if(i==0)cout<<"[";
+   if(i==SIZE_V-16)cout<<"[";
 cout<<mat[i]<<" ";
-if(i==15)cout<<"]"<<endl;
+if(i==SIZE_V-1)cout<<"]"<<endl;
    }
    cout<<"result:"<<endl;
-   for(int i=0;i<4;i++){
-       if(i==0)cout<<"[";
+   for(int i=SIZE_R-8;i<SIZE_R;i++){
+       if(i==SIZE_R-8)cout<<"[";
    cout<<result[i]<<" ";
-       if(i==3)cout<<"]"<<endl;
+       if(i==SIZE_R-1)cout<<"]"<<endl;
    }
 
 
