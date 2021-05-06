@@ -17,6 +17,5 @@ add_library(${PROJECT_NAME} SHARED ${clconv_SRCS} ${clconv_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} OpenCL::OpenCL)
 
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/matvec.cl  ${CMAKE_CURRENT_BINARY_DIR}/../ejercicioFraccionario COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sumvec.cl  ${CMAKE_CURRENT_BINARY_DIR}/../ejercicioFraccionario COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/reduction_complete.cl  ${CMAKE_CURRENT_BINARY_DIR}/../ejercicioFraccionario COPYONLY)
 
