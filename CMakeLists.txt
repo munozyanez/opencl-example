@@ -7,6 +7,7 @@ add_subdirectory(lib)
 
 add_subdirectory(ejercicioFraccionario ejercicioFraccionario)
 add_subdirectory(Reduction Reduction)
+add_subdirectory(wg_test wg_test)
 
 #project(FracionalControl) no se pueden poner varios proyectos en un archivo
 

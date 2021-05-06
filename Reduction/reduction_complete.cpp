@@ -1,16 +1,18 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define PROGRAM_FILE "reduction_complete.cl"
 
-#define ARRAY_SIZE 1048576/4
+#define VECTOR_SIZE 131072//1048576/4//2^17
+#define ARRAY_SIZE VECTOR_SIZE/4//1048576/4
 #define KERNEL_1 "reduction_vector"
 #define KERNEL_2 "reduction_complete"
+#define KERNEL_3 "vec_mult"
 
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
+#include<iostream>
 #ifdef MAC
 #include <OpenCL/cl.h>
 #else
@@ -101,27 +103,30 @@ int main() {
    cl_device_id device;
    cl_context context;
    cl_program program;
-   cl_kernel vector_kernel, complete_kernel;
+   cl_kernel vector_kernel, complete_kernel,mult_kernel;
    cl_command_queue queue;
    cl_event start_event, end_event;
    cl_int i, err;
    size_t local_size, global_size;
 
    /* Data and buffers */
-   float data[ARRAY_SIZE];
+   float data[ARRAY_SIZE],v1[VECTOR_SIZE],v2[VECTOR_SIZE];//
    float sum, actual_sum;
-   cl_mem data_buffer, sum_buffer;
+   cl_mem data_buffer, sum_buffer,v1_buffer,v2_buffer;
    cl_ulong time_start, time_end, total_time;
 
-   /* Initialize data */
-   for(i=0; i<ARRAY_SIZE; i++) {
-      data[i] = 1.0f*i;
+   for(i=0; i<VECTOR_SIZE; i++) {
+      v1[i] = 1.0f*i;
+      v2[i] = 1.0f*i;
+      actual_sum+=v1[i]*v2[i];
    }
 
    /* Create device and determine local size */
    device = create_device();
    err = clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_GROUP_SIZE, 	
-         sizeof(local_size), &local_size, NULL);	
+         sizeof(local_size), &local_size, NULL);
+   std::cout<<" Local_Size:"<<local_size<<std::endl;
+//   local_size=4;
    if(err < 0) {
       perror("Couldn't obtain device information");
       exit(1);   
@@ -142,6 +147,9 @@ int main() {
          CL_MEM_USE_HOST_PTR, ARRAY_SIZE * sizeof(float), data, &err);
    sum_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, 
          sizeof(float), NULL, &err);
+
+    v1_buffer= clCreateBuffer(context, CL_MEM_READ_ONLY |CL_MEM_COPY_HOST_PTR, VECTOR_SIZE *sizeof(float),v1, &err);
+    v2_buffer= clCreateBuffer(context, CL_MEM_READ_ONLY |CL_MEM_COPY_HOST_PTR,VECTOR_SIZE *sizeof(float),v2, &err);
    if(err < 0) {
       perror("Couldn't create a buffer");
       exit(1);   
@@ -158,6 +166,7 @@ int main() {
    /* Create kernels */
    vector_kernel = clCreateKernel(program, KERNEL_1, &err);
    complete_kernel = clCreateKernel(program, KERNEL_2, &err);
+   mult_kernel=clCreateKernel(program, KERNEL_3, &err);
    if(err < 0) {
       perror("Couldn't create a kernel");
       exit(1);
@@ -171,18 +180,31 @@ int main() {
    err = clSetKernelArg(complete_kernel, 0, sizeof(cl_mem), &data_buffer);
    err |= clSetKernelArg(complete_kernel, 1, local_size * 4 * sizeof(float), NULL);
    err |= clSetKernelArg(complete_kernel, 2, sizeof(cl_mem), &sum_buffer);
+
+   /* Set arguments for multiplication vector kernel */
+   err = clSetKernelArg(mult_kernel, 0, sizeof(cl_mem), &v1_buffer);
+   err |= clSetKernelArg(mult_kernel, 1, sizeof(cl_mem), &v1_buffer);
+   err |= clSetKernelArg(mult_kernel, 2, sizeof(cl_mem), &data_buffer);
+
+
+
+
    if(err < 0) {
       perror("Couldn't create a kernel argument");
       exit(1);   
    }
 
    /* Enqueue kernels */
+
+   global_size = ARRAY_SIZE;
+   err = clEnqueueNDRangeKernel(queue, mult_kernel, 1, NULL, &global_size,NULL, 0, NULL,  &start_event);
+ /*now global_size is 4 time smaller than before */
    global_size = ARRAY_SIZE/4;
-   err = clEnqueueNDRangeKernel(queue, vector_kernel, 1, NULL, &global_size, 
-         &local_size, 0, NULL, &start_event);
+   err = clEnqueueNDRangeKernel(queue, vector_kernel, 1, NULL, &global_size,
+         &local_size, 0, NULL,NULL);
    if(err < 0) {
       perror("Couldn't enqueue the kernel");
-      exit(1);   
+      exit(1);
    }
    printf("Global size = %zu\n", global_size);
 
@@ -194,7 +216,7 @@ int main() {
       printf("Global size = %zu\n", global_size);
       if(err < 0) {
          perror("Couldn't enqueue the kernel");
-         exit(1);   
+         exit(1);
       }
    }
    global_size = global_size/local_size;
@@ -217,9 +239,10 @@ int main() {
       perror("Couldn't read the buffer");
       exit(1);   
    }
-
+ std::cout<<"Suma real: "<<sum<<std::endl;
    /* Check result */
-   actual_sum = 1.0f * (ARRAY_SIZE/2)*(ARRAY_SIZE-1);
+//   actual_sum = 1.0f * (ARRAY_SIZE/2)*(ARRAY_SIZE-1);
+    std::cout<<"Suma esperada: "<<actual_sum<<std::endl;
    if(fabs(sum - actual_sum) > 0.01*fabs(sum))
       printf("Check failed.\n");
    else

@@ -6,11 +6,12 @@ include_directories(${OpenCL_INCLUDE_DIRS})
 include_directories(${clconv_INCLUDE_DIRS})
 
 
-add_executable(reduction_complete reduction_complete.cpp)
-target_link_libraries(reduction_complete clconv)
+add_executable(wg_test wg_test.cpp)
+target_link_libraries(wg_test clconv)
 message(STATUS "exe: " ${clconv_LIBARIES})
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/reduction_complete.cl  ${CMAKE_CURRENT_BINARY_DIR}/../Reduction COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/blank.cl  ${CMAKE_CURRENT_BINARY_DIR}/../wg_test COPYONLY)
+
 
 #target_include_directories(matvec PUBLIC
 #                              "${PROJECT_BINARY_DIR}"

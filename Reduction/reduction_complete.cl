@@ -1,3 +1,10 @@
+__kernel void vec_mult(__global float4* v1,
+                          __global float4* v2,
+                          __global float* data){
+    int i = get_global_id(0);
+    data[i] = dot(v1[i],v2[i]);
+}
+
 __kernel void reduction_vector(__global float4* data, 
       __local float4* partial_sums) {
 
