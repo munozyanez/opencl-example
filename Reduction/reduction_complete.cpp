@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define PROGRAM_FILE "reduction_complete.cl"
 
-#define VECTOR_SIZE 131072//1048576/4//2^17
+#define VECTOR_SIZE 32//1048576/4//2^17
 #define ARRAY_SIZE VECTOR_SIZE/4//1048576/4
 #define KERNEL_1 "reduction_vector"
 #define KERNEL_2 "reduction_complete"
@@ -44,6 +44,7 @@ void create_device(cl_device_id &dev,size_t &local_size) {
    }
    err = clGetDeviceInfo(dev, CL_DEVICE_MAX_WORK_GROUP_SIZE,
          sizeof(local_size), &local_size, NULL);
+   local_size=2;
    std::cout<<" Local_Size:"<<local_size<<std::endl;
    if(err < 0) {
       perror("Couldn't obtain device information");
@@ -156,10 +157,13 @@ void create_kernel(cl_program &program,cl_kernel &vector_kernel,cl_kernel &compl
 void  enqueue_kernels(cl_command_queue &queue,cl_kernel &mult_kernel,cl_kernel &vector_kernel,cl_kernel &complete_kernel,size_t &global_size,size_t &local_size,cl_event &start_event,cl_event &end_event,cl_ulong &total_time,cl_int &err){
 
      cl_ulong time_start, time_end;
+     std::cout<<"(1)"<<global_size;
      global_size = ARRAY_SIZE;
+      std::cout<<"(2)"<<global_size;
      err = clEnqueueNDRangeKernel(queue, mult_kernel, 1, NULL, &global_size,NULL, 0, NULL,  &start_event);
    /*now global_size is 4 time smaller than before */
      global_size = ARRAY_SIZE/4;
+      std::cout<<"(3)"<<global_size;
       do{
         err = clEnqueueNDRangeKernel(queue, vector_kernel, 1, NULL, &global_size,
               &local_size, 0, NULL, NULL);
@@ -169,6 +173,7 @@ void  enqueue_kernels(cl_command_queue &queue,cl_kernel &mult_kernel,cl_kernel &
            exit(1);
         }
         global_size = global_size/local_size;
+         std::cout<<"(5)"<<global_size;
      }while(global_size/local_size > local_size);
 
      err = clEnqueueNDRangeKernel(queue, complete_kernel, 1, NULL, &global_size,

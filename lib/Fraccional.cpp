@@ -1,34 +1,16 @@
 #include "Fraccional.h"
 
-#ifdef MAC
-#include <OpenCL/cl.h>
-#else
-//#include <CL/cl.h>
-#endif
-
-
-
-clConv::clConv(long new_verctorSize) : verctorSize(new_verctorSize)
+clConv::clConv(long verctorSize) : VECTOR_SIZE(verctorSize)
 {
-
-
-////    v1.resize(new_verctorSize);
-////    v2.resize(new_verctorSize);
-////    result.resize(new_verctorSize);
-
-
+    /*Initialize the data size of type float4*/
+     ARRAY_SIZE=VECTOR_SIZE/4;
 
     /* Create device and determine local size */
     create_device(device,local_size);
 
-
     /* Build program */
     build_program(context,device,PROGRAM_FILE,program);
 
-
-
-
-////    test_result(result,correct);
 }
 
 clConv::~clConv()
@@ -36,25 +18,15 @@ clConv::~clConv()
     /* Deallocate resources */
   deallocate_resources(context,program,queue,complete_kernel,vector_kernel,mult_kernel,v1_buffer,v2_buffer,data_buffer,sum_buffer,end_event,start_event);
 
-
 }
 
 float clConv::convolution(float *v1, float*v2)
 {
 
-//    _v1=v1;
-//    _v2=v2;
-//    for(int i=0;i<10;i++){
-//        std::cout<<v1[i]<<" "<<v2[i]<<endl;
-//    }
-      // _data.resize(ARRAY_SIZE);
-////    result.clear();
-////    result.resize(verctorSize);
-
+    /***se eliminara despues****/
     for(int i=0; i<VECTOR_SIZE; i++) {
        actual_sum+=v1[i]*v2[i];
     }
-    //cout<<actual_sum;
     /* Create data buffer */
     create_buffer(context,_data,v1,v2,data_buffer,sum_buffer,v1_buffer,v2_buffer,err);
 
@@ -96,6 +68,11 @@ void clConv::create_device(cl_device_id &dev,size_t &local_size) {
    }
    err = clGetDeviceInfo(dev, CL_DEVICE_MAX_WORK_GROUP_SIZE,
          sizeof(local_size), &local_size, NULL);
+/*we must ensure that the number of input data is at least more than 16 times larger than the size of the workgroups*/
+   if(local_size>VECTOR_SIZE/16){
+       local_size=VECTOR_SIZE/16;
+   }
+
    std::cout<<" Local_Size:"<<local_size<<std::endl;
    if(err < 0) {
       perror("Couldn't obtain device information");
@@ -156,9 +133,10 @@ void clConv::build_program(cl_context &ctx, cl_device_id dev, const char* filena
 void clConv::create_buffer(cl_context &context,vector<float> &data,float*v1,float*v2,cl_mem &data_buffer,cl_mem &sum_buffer,cl_mem &v1_buffer,cl_mem &v2_buffer,cl_int &err){
     data_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE |
           CL_MEM_USE_HOST_PTR, ARRAY_SIZE * sizeof(float), &data, &err);
+    /*we create the buffer for sum*/
     sum_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY,
           sizeof(float), NULL, &err);
-
+   /* we create the buffer for v1 and v2*/
      v1_buffer= clCreateBuffer(context, CL_MEM_READ_ONLY |CL_MEM_COPY_HOST_PTR, VECTOR_SIZE *sizeof(float),v1, &err);
      v2_buffer= clCreateBuffer(context, CL_MEM_READ_ONLY |CL_MEM_COPY_HOST_PTR,VECTOR_SIZE *sizeof(float),v2, &err);
     if(err < 0) {
@@ -242,6 +220,7 @@ void clConv::read_buffer_enqueue(cl_command_queue &queue,cl_mem &sum_buffer,floa
        exit(1);
     }
      std::cout<<"Suma real: "<<sum<<std::endl;
+     /*se borrara******/
     /* Check result */
      std::cout<<"Suma esperada: "<<actual_sum<<std::endl;
     if(fabs(sum - actual_sum) > 0.01*fabs(sum))
@@ -249,6 +228,7 @@ void clConv::read_buffer_enqueue(cl_command_queue &queue,cl_mem &sum_buffer,floa
     else
        printf("Check passed.\n");
     printf("Total time = %lu\n", total_time);
+
 }
 void clConv::deallocate_resources(cl_context &context,cl_program &program,cl_command_queue &queue,cl_kernel &complete_kernel,cl_kernel &vector_kernel,cl_kernel &mult_kernel,cl_mem &v1_buffer,cl_mem &v2_buffer,cl_mem &data_buffer,cl_mem &sum_buffer,cl_event &end_event,cl_event &start_event){
     clReleaseEvent(start_event);

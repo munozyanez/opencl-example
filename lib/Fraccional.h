@@ -23,7 +23,7 @@ using namespace std;
 class clConv
 {
 public:
-    clConv(long new_verctorSize = 1024);
+    clConv(long verctorSize = 131072);
     ~clConv();
 
    float convolution(float*v1, float*v2);
