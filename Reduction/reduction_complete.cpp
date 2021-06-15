@@ -157,28 +157,28 @@ void create_kernel(cl_program &program,cl_kernel &vector_kernel,cl_kernel &compl
 void  enqueue_kernels(cl_command_queue &queue,cl_kernel &mult_kernel,cl_kernel &vector_kernel,cl_kernel &complete_kernel,size_t &global_size,size_t &local_size,cl_event &start_event,cl_event &end_event,cl_ulong &total_time,cl_int &err){
 
      cl_ulong time_start, time_end;
-     std::cout<<"(1)"<<global_size;
+//     std::cout<<"(1)"<<global_size;
      global_size = ARRAY_SIZE;
-      std::cout<<"(2)"<<global_size;
+//      std::cout<<"(2)"<<global_size;
      err = clEnqueueNDRangeKernel(queue, mult_kernel, 1, NULL, &global_size,NULL, 0, NULL,  &start_event);
    /*now global_size is 4 time smaller than before */
      global_size = ARRAY_SIZE/4;
-      std::cout<<"(3)"<<global_size;
+//      std::cout<<"(3)"<<global_size;
       do{
         err = clEnqueueNDRangeKernel(queue, vector_kernel, 1, NULL, &global_size,
               &local_size, 0, NULL, NULL);
-        printf("Global size = %zu\n", global_size);
+//        printf("Global size = %zu\n", global_size);
         if(err < 0) {
            perror("Couldn't enqueue the kernel");
            exit(1);
         }
         global_size = global_size/local_size;
-         std::cout<<"(5)"<<global_size;
+//         std::cout<<"(5)"<<global_size;
      }while(global_size/local_size > local_size);
 
      err = clEnqueueNDRangeKernel(queue, complete_kernel, 1, NULL, &global_size,
            NULL, 0, NULL, &end_event);
-     printf("Global size = %zu\n", global_size);
+//     printf("Global size = %zu\n", global_size);
 
      /* Finish processing the queue and get profiling information */
      clFinish(queue);

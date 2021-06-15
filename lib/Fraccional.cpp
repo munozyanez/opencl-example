@@ -24,9 +24,9 @@ float clConv::convolution(float *v1, float*v2)
 {
 
     /***se eliminara despues****/
-    for(int i=0; i<VECTOR_SIZE; i++) {
-       actual_sum+=v1[i]*v2[i];
-    }
+//    for(int i=0; i<VECTOR_SIZE; i++) {
+//       actual_sum+=v1[i]*v2[i];
+//    }
     /* Create data buffer */
     create_buffer(context,_data,v1,v2,data_buffer,sum_buffer,v1_buffer,v2_buffer,err);
 
@@ -73,7 +73,8 @@ void clConv::create_device(cl_device_id &dev,size_t &local_size) {
        local_size=VECTOR_SIZE/16;
    }
 
-   std::cout<<" Local_Size:"<<local_size<<std::endl;
+//   std::cout<<" Local_Size:"<<local_size<<std::endl;
+
    if(err < 0) {
       perror("Couldn't obtain device information");
       exit(1);
@@ -190,7 +191,7 @@ void clConv::enqueue_kernels(cl_command_queue &queue,cl_kernel &mult_kernel,cl_k
       do{
         err = clEnqueueNDRangeKernel(queue, vector_kernel, 1, NULL, &global_size,
               &local_size, 0, NULL, NULL);
-        printf("Global size = %zu\n", global_size);
+//        printf("Global size = %zu\n", global_size);
         if(err < 0) {
            perror("Couldn't enqueue the kernel");
            exit(1);
@@ -200,7 +201,7 @@ void clConv::enqueue_kernels(cl_command_queue &queue,cl_kernel &mult_kernel,cl_k
 
      err = clEnqueueNDRangeKernel(queue, complete_kernel, 1, NULL, &global_size,
            NULL, 0, NULL, &end_event);
-     printf("Global size = %zu\n", global_size);
+//     printf("Global size = %zu\n", global_size);
 
      /* Finish processing the queue and get profiling information */
      clFinish(queue);
@@ -219,15 +220,15 @@ void clConv::read_buffer_enqueue(cl_command_queue &queue,cl_mem &sum_buffer,floa
        perror("Couldn't read the buffer");
        exit(1);
     }
-     std::cout<<"Suma real: "<<sum<<std::endl;
-     /*se borrara******/
-    /* Check result */
-     std::cout<<"Suma esperada: "<<actual_sum<<std::endl;
-    if(fabs(sum - actual_sum) > 0.01*fabs(sum))
-       printf("Check failed.\n");
-    else
-       printf("Check passed.\n");
-    printf("Total time = %lu\n", total_time);
+//     std::cout<<"Suma real: "<<sum<<std::endl;
+//     /*se borrara******/
+//    /* Check result */
+//     std::cout<<"Suma esperada: "<<actual_sum<<std::endl;
+//    if(fabs(sum - actual_sum) > 0.01*fabs(sum))
+//       printf("Check failed.\n");
+//    else
+//       printf("Check passed.\n");
+//    printf("Total time = %lu\n", total_time);
 
 }
 void clConv::deallocate_resources(cl_context &context,cl_program &program,cl_command_queue &queue,cl_kernel &complete_kernel,cl_kernel &vector_kernel,cl_kernel &mult_kernel,cl_mem &v1_buffer,cl_mem &v2_buffer,cl_mem &data_buffer,cl_mem &sum_buffer,cl_event &end_event,cl_event &start_event){
